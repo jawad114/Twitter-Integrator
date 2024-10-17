@@ -3,13 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class AccessTokenDto {
   @ApiProperty({
     description: 'OAuth Access Token for authenticating API requests',
-    example: 'your-oauth-access-token',
+    example: 'oauth-access-token',
   })
   oauthAccessToken: string;
 
   @ApiProperty({
     description: 'OAuth Access Token Secret',
-    example: 'your-oauth-access-token-secret',
+    example: 'oauth-access-token-secret',
   })
   oauthAccessTokenSecret: string;
 }
@@ -25,13 +25,13 @@ export class PostTweetDto {
 export class RequestTokenDto {
   @ApiProperty({
     description: 'OAuth token returned from the request token endpoint',
-    example: 'your-oauth-token',
+    example: 'oauth-token',
   })
   oauthToken: string;
 
   @ApiProperty({
     description: 'OAuth token secret associated with the request token',
-    example: 'your-oauth-token-secret',
+    example: 'oauth-token-secret',
   })
   oauthTokenSecret: string;
 }
@@ -45,13 +45,13 @@ export class UserInfoDto {
 
   @ApiProperty({
     description: 'Name of the Twitter user',
-    example: 'John Doe',
+    example: 'Java_shah',
   })
   name: string;
 
   @ApiProperty({
     description: 'Username of the Twitter user',
-    example: 'johndoe',
+    example: 'java_shah',
   })
   username: string;
 
