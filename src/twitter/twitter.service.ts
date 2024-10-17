@@ -3,15 +3,21 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import * as OAuth from 'oauth';
 import { lastValueFrom } from 'rxjs';
-
+import { TwitterApi } from 'twitter-api-v2'; 
 @Injectable()
 export class TwitterService {
   private oauth: OAuth.OAuth;
   private readonly bearerToken: string;
+  private twitterClient: TwitterApi;
   constructor(
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
+ 
   ) {
+    this.twitterClient = new TwitterApi({
+        appKey: 'yQz0Y0KcwUKX5MFuwicuYgg29',
+        appSecret: 'FWiso9rm3g3vkijwdknr8sdFZCngXYntFjFLxfaaUWi9E4tHtU',
+      });
     this.bearerToken = this.configService.get<string>('TWITTER_BEARER_TOKEN');
     this.oauth = new OAuth.OAuth(
       'https://api.twitter.com/oauth/request_token',
@@ -70,101 +76,86 @@ export class TwitterService {
   }
 
 
-//   async getFollowers(oauthAccessToken: string, oauthAccessTokenSecret: string) {
-//     return new Promise((resolve, reject) => {
-//       this.oauth.get(
-//         'https://api.twitter.com/1.1/followers/list.json',
-//         oauthAccessToken,
-//         oauthAccessTokenSecret,
-//         (error, data, response) => {
-//           if (error) {
-//             console.error('Error fetching followers:', error);
-//             return reject(error);
-//           }
-  
 
-//           console.log('Twitter API Response Data:', data);
-//           console.log('Twitter API Response:', response);
-  
+  async postTweet(oauthAccessToken: string, oauthAccessTokenSecret: string, tweet: string): Promise<any> {
+    try {
+      const client = new TwitterApi({
+        appKey: 'yQz0Y0KcwUKX5MFuwicuYgg29',
+        appSecret: 'FWiso9rm3g3vkijwdknr8sdFZCngXYntFjFLxfaaUWi9E4tHtU',
+        accessToken: oauthAccessToken,
+        accessSecret: oauthAccessTokenSecret,
+      });
+
+      const tweetResponse = await client.v1.tweet(tweet); 
+      return tweetResponse;
+    } catch (error) {
+      throw error; 
+    }
+  }
+
+  async getUserInfo(oauthAccessToken: string, oauthAccessTokenSecret: string): Promise<any> {
+    try {
       
-//           console.log('Rate Limit Remaining:', response.headers['x-rate-limit-remaining']);
-//           console.log('Rate Limit Reset:', response.headers['x-rate-limit-reset']);
-  
-//           try {
-//             const followersData = JSON.parse(data);
-//             resolve(followersData);
-//           } catch (parseError) {
-//             console.error('Error parsing JSON response:', parseError);
-//             reject(parseError);
-//           }
-//         }
-//       );
-//     });
-//   }
-  
+      const userClient = new TwitterApi({
+        appKey: 'yQz0Y0KcwUKX5MFuwicuYgg29',
+        appSecret: 'FWiso9rm3g3vkijwdknr8sdFZCngXYntFjFLxfaaUWi9E4tHtU',
+        accessToken: oauthAccessToken,
+        accessSecret: oauthAccessTokenSecret,
+      });
 
-
-//   async postTweet(oauthAccessToken: string, oauthAccessTokenSecret: string, tweet: string) {
-//     return new Promise((resolve, reject) => {
-//       this.oauth.post(
-//         'https://api.twitter.com/1.1/statuses/update.json',
-//         oauthAccessToken,
-//         oauthAccessTokenSecret,
-//         { status: tweet },
-//         'application/json',
-//         (error, data, response) => {
-//           if (error) {
-//             return reject(error);
-//           }
-//           resolve(JSON.parse(data));
-//         },
-//       );
-//     });
-//   }
-
-
-
-
-async getFollowers(userId: string): Promise<any> {
-    const url = `https://api.twitter.com/2/users/${userId}/followers`;
-
-    try {
-      const response = await lastValueFrom(
-        this.httpService.get(url, {
-          headers: {
-            Authorization: `Bearer ${this.bearerToken}`,
-          },
-        }),
-      );
-      return response.data;
+    
+      const user = await userClient.v2.me();
+      return user;
     } catch (error) {
-      console.error('Error fetching followers:', error);
-      throw error;
+      console.error('Error fetching user info:', error);
+      throw error; 
     }
   }
-
-  // Method to post a tweet using API v2
-  async postTweet(tweet: string): Promise<any> {
-    const url = 'https://api.twitter.com/2/tweets';
-
-    try {
-      const response = await lastValueFrom(
-        this.httpService.post(
-          url,
-          { text: tweet }, // API v2 uses "text" instead of "status"
-          {
-            headers: {
-              Authorization: `Bearer ${this.bearerToken}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        ),
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error posting tweet:', error);
-      throw error;
-    }
-  }
-
 }
+
+
+
+
+// async getFollowers(userId: string): Promise<any> {
+//     const url = `https://api.twitter.com/2/users/${userId}/followers`;
+
+//     try {
+//       const response = await lastValueFrom(
+//         this.httpService.get(url, {
+//           headers: {
+//             Authorization: `Bearer ${this.bearerToken}`,
+//           },
+//         }),
+//       );
+//       return response.data;
+//     } catch (error) {
+//       console.error('Error fetching followers:', error);
+//       throw error;
+//     }
+//   }
+
+//   // Method to post a tweet using API v2
+//   async postTweet(tweet: string): Promise<any> {
+//     const url = 'https://api.twitter.com/2/tweets';
+
+//     try {
+//       const response = await lastValueFrom(
+//         this.httpService.post(
+//           url,
+//           { text: tweet }, // API v2 uses "text" instead of "status"
+//           {
+//             headers: {
+//               Authorization: `Bearer ${this.bearerToken}`,
+//               'Content-Type': 'application/json',
+//             },
+//           },
+//         ),
+//       );
+//       return response.data;
+//     } catch (error) {
+//       console.error('Error posting tweet:', error);
+//       throw error;
+//     }
+//   }
+
+// }
