@@ -13,6 +13,6 @@ export class HubspotController {
   @Get('callback')
   async handleCallback(@Query('code') code: string) {
     const tokens = await this.authService.handleCallback(code);
-    return tokens; // You might want to store tokens in a database
+    return tokens; 
   }
 }

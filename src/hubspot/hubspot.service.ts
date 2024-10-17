@@ -9,7 +9,13 @@ export class HubspotService {
   getAuthUrl() {
     const clientId = this.configService.get<string>('HUBSPOT_CLIENT_ID');
     const redirectUri = this.configService.get<string>('HUBSPOT_REDIRECT_URI');
-    const scopes = 'contacts'; 
+    const scopes = [
+        'crm.objects.contacts.read',
+        'crm.objects.contacts.write',
+        'crm.schemas.contacts.read',
+        'crm.schemas.contacts.write',
+        'oauth'
+    ].join(',');
     return `https://app.hubspot.com/oauth/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
   }
 
